@@ -20,32 +20,36 @@ class FileSystem:
       tmp = tmp.parent
   
   def _perform_ls(self, line: str):
-    temp = line.split(' ')
+    try:
+      sh_symbol, command = line.split(' ')
+    except ValueError as e:
+      print(f'Error: Expected one command line argument for \'cd\': {e}')
     if re.match('^dir', line):
-      Node(f'{temp[1]}', parent=self.cursor, type='dir', size=0)
-    elif re.match('^[^a-z]', temp[0]):  # create file
-      Node(f'{temp[1]}', parent=self.cursor, type='file', size=int(temp[0]))
-      self._increase_folder_sizes(int(temp[0]))    
-    else:  # this was useful for testing. do I keep it in now?
-      raise Exception(f'ls parsing exception for line: {line}')
+      Node(f'{command}', parent=self.cursor, type='dir', size=0)
+    elif re.match('^[^a-z]', sh_symbol):  # create file
+      Node(f'{command}', parent=self.cursor, type='file', size=int(sh_symbol))
+      self._increase_folder_sizes(int(sh_symbol))
+    else:
+      raise TypeError(f'ls parsing exception for line: {line}')
 
   def _perform_cd(self, line: str):
-    temp = line.split(' ')
-    if re.match('^\.\.', temp[2]): # go to parent
+    try:
+      sh_symbol, command, directory = line.split(' ')
+    except ValueError as e:
+      print(f'Error: Expected one command line argument for \'cd\': {e}')
+    if re.match('^\.\.', directory): # go to parent
       self.cursor = self.cursor.parent
-    elif re.match('^[a-z]', temp[2][0]): # go to child
-      for node in self.cursor.children:
-        if node.name == temp[2]:  # "if [...] if" -- avoidable??
-          self.cursor = node
-    elif re.match('^/', temp[2]):  # go to /
+    elif re.match('^[a-z]', directory[0]): # go to child
+      self.cursor = next(filter(lambda n: n.name == directory, self.cursor.children))
+    elif re.match('^/', directory):  # go to /
       self.cursor = self.head
-    else:  # this was useful for testing. do I keep it in now?
-      raise Exception(f'cd type: {line}')
+    else:
+      raise TypeError(f'cd type: {line}')
     
   def populate(self):
     with open(f'{self._FILE_NAME}', encoding='utf-8') as file:
       inputs = file.readlines()
-    for line in tqdm(inputs):  # go for a walk
+    for line in tqdm(inputs):
       line = line.strip()
       if re.match('^\$\ cd', line):
         self._perform_cd(line)
@@ -61,15 +65,15 @@ class FileSystem:
     tracker = initializer
     stack = deque()
     stack.append(self.head)
-    while(stack):
-      tmp = stack.pop()
+    while stack:
+      current = stack.pop()
       if flag == 'p1':
-        if tmp.size <= self._MAX_SIZE:
-          tracker += tmp.size
+        if current.size <= self._MAX_SIZE:
+          tracker += current.size
       elif flag == 'p2':
-        if self._unused_space + tmp.size >= self._TARGET_UNUSED and tmp.size < tracker:
-          tracker = tmp.size
-      for node in tmp.children:
-        if node.type=='dir':
+        if self._unused_space + current.size >= self._TARGET_UNUSED and current.size < tracker:
+          tracker = current.size
+      for node in current.children:
+        if node.type == 'dir':
           stack.append(node)
     print(f'{flag}: {tracker}')
