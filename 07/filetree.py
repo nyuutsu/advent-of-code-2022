@@ -1,7 +1,7 @@
-import math, re, string
 from collections import deque
+from os import path
+from re import match
 from anytree import Node, RenderTree
-from tqdm import tqdm, trange
 
 class FileSystem:
   def __init__(self, file_flag: str):
@@ -24,9 +24,9 @@ class FileSystem:
       sh_symbol, command = line.split(' ')
     except ValueError as e:
       print(f'Error: Expected one command line argument for \'cd\': {e}')
-    if re.match('^dir', line):
+    if match('^dir', line):
       Node(f'{command}', parent=self.cursor, type='dir', size=0)
-    elif re.match('^[^a-z]', sh_symbol):  # create file
+    elif match('^[^a-z]', sh_symbol):  # create file
       Node(f'{command}', parent=self.cursor, type='file', size=int(sh_symbol))
       self._increase_folder_sizes(int(sh_symbol))
     else:
@@ -37,23 +37,23 @@ class FileSystem:
       sh_symbol, command, directory = line.split(' ')
     except ValueError as e:
       print(f'Error: Expected one command line argument for \'cd\': {e}')
-    if re.match('^\.\.', directory): # go to parent
+    if match('^\.\.', directory): # go to parent
       self.cursor = self.cursor.parent
-    elif re.match('^[a-z]', directory[0]): # go to child
+    elif match('^[a-z]', directory[0]): # go to child
       self.cursor = next(filter(lambda n: n.name == directory, self.cursor.children))
-    elif re.match('^/', directory):  # go to /
+    elif match('^/', directory):  # go to /
       self.cursor = self.head
     else:
       raise TypeError(f'cd type: {line}')
     
   def populate(self):
-    with open(f'{self._FILE_NAME}', encoding='utf-8') as file:
+    with open(path.join('07', self._FILE_NAME), 'r', encoding='utf-8') as file:
       inputs = file.readlines()
-    for line in tqdm(inputs):
+    for line in inputs:
       line = line.strip()
-      if re.match('^\$\ cd', line):
+      if match('^\$\ cd', line):
         self._perform_cd(line)
-      elif re.match('^[^\$]', line):
+      elif match('^[^\$]', line):
         self._perform_ls(line)
     self._unused_space = self._DISK_CAPACITY - self.head.size
 

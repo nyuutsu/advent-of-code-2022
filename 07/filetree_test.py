@@ -1,6 +1,6 @@
 import filetree
 import math
-import pytest
+#import pytest
 
 def routine(filename: str):
   fs = filetree.FileSystem(filename)
@@ -10,8 +10,8 @@ def routine(filename: str):
   fs.traverse('p2', math.inf)
   
 def main():
-  #routine('test')
-  routine('input')
+  #routine('07_example')
+  routine('07_input')
 
 if __name__ == '__main__':
   main()

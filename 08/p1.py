@@ -1,6 +1,8 @@
+from os import path
+
 def populate(file_name):
   grid = []
-  with open(f'{file_name}', encoding='utf-8') as file:
+  with open(path.join('08', file_name), 'r') as file:
     [grid.append([int(x) for x in line.strip()]) for line in file.readlines()]
   return grid
 
@@ -23,6 +25,6 @@ def quantify(the_grid):
   return sum(sum(detect(the_grid, outer, inner) for inner in range(len(the_grid[0]))) for outer in range(len(the_grid)))
   
 def main():
-  print(f'unobstructed trees: {quantify(populate("input"))}')
+  print(f'unobstructed trees: {quantify(populate("08_input"))}')
   
 main()
