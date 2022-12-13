@@ -1,8 +1,7 @@
  __pycache__/
  */__pycache__/
  *.pyc
-*_input
-input
-input_*
-example
-example_2
+input*
+*input
+example*
+*example*
