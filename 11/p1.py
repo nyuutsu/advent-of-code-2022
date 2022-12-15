@@ -1,7 +1,6 @@
 # https://adventofcode.com/2022/day/11
 
 from os import path
-from pprint import pprint
 
 class ApeMinder:
   def __init__(self):

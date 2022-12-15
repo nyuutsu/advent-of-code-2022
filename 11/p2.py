@@ -1,7 +1,6 @@
 # https://adventofcode.com/2022/day/11
 
 from os import path
-from pprint import pprint
 
 class ApeMinder:
   def __init__(self):
@@ -19,7 +18,7 @@ class ApeMinder:
 
 class Ape:
   def __init__(self, ape_data):
-    _id, _items, _operation, _test, _if_true, _if_false = [x for x in ape_data]
+    _id, _items, _operation, _test, _if_true, _if_false = ape_data
     self.id = int(_id[1].strip(':'))
     self.items = [int(x.strip(',')) for x in _items[2:]]
     if _operation[5] == 'old':
